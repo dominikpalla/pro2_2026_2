@@ -1,6 +1,8 @@
 package cz.uhk.spring2.service;
 
 import cz.uhk.spring2.model.User;
+import cz.uhk.spring2.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -9,42 +11,33 @@ import java.util.List;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private ArrayList<User> users = new ArrayList<>();
+    private UserRepository userRepository;
+
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public void saveUser(User user) {
-        if(user.getId() > 0){
-            User original = getUser(user.getId());
-            users.remove(original);
-        }else{
-            user.setId(1);
-            if(!users.isEmpty()){
-                user.setId(users.get(users.size()-1).getId() + 1);
-            }
-        }
-        users.add(user);
+        userRepository.save(user);
     }
 
     @Override
     public User getUser(long id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
-        }
-        return null;
+        return userRepository.findById(id).orElse(null);
     }
 
     @Override
     public void deleteUser(long id) {
         User u = getUser(id);
         if(u != null){
-            users.remove(u);
+            userRepository.delete(u);
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-        return users;
+        return userRepository.findAll();
     }
 }
