@@ -1,7 +1,9 @@
 package cz.uhk.spring2.controller;
 
 import cz.uhk.spring2.model.User;
+import cz.uhk.spring2.service.UserService;
 import org.jspecify.annotations.Nullable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,18 +14,16 @@ import java.util.ArrayList;
 @RequestMapping("/users")
 public class UserController {
 
-    private ArrayList<User> users = new ArrayList<>();
+    private UserService userService;
 
-    public UserController() {
-        User u = new User();
-        u.setName("Karel");
-        u.setId(1);
-        users.add(u);
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
     @GetMapping("/")
     public String list(Model model){
-        model.addAttribute("users", users);
+        model.addAttribute("users", userService.getAllUsers());
         return "users_list";
     }
 
@@ -34,23 +34,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public String detail(@PathVariable int id, Model model){
-        model.addAttribute("user", findUserById(id));
+    public String detail(@PathVariable long id, Model model){
+        model.addAttribute("user", userService.getUser(id));
         return "users_detail";
     }
 
-    private User findUserById(int id) {
-        for (User user : users) {
-            if (user.getId() == id) {
-                return user;
-            }
-        }
-        return null;
-    }
-
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable int id, Model model){
-        User u = findUserById(id);
+    public String edit(@PathVariable long id, Model model){
+        User u = userService.getUser(id);
         if (u != null) {
             model.addAttribute("user", u);
             return "users_edit";
@@ -60,26 +51,14 @@ public class UserController {
     }
 
     @GetMapping("/{id}/delete")
-    public String delete(@PathVariable int id){
-        User u = findUserById(id);
-        if(u != null){
-            users.remove(u);
-        }
+    public String delete(@PathVariable long id){
+        userService.deleteUser(id);
         return "redirect:/users/";
     }
 
     @PostMapping("/save")
     public String save(@ModelAttribute User user){
-        if(user.getId() > 0){
-            User original = findUserById(user.getId());
-            users.remove(original);
-        }else{
-            user.setId(1);
-            if(!users.isEmpty()){
-                user.setId(users.get(users.size()-1).getId() + 1);
-            }
-        }
-        users.add(user);
+        userService.saveUser(user);
         return "redirect:/users/";
     }
 
