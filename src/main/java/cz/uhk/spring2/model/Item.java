@@ -11,6 +11,17 @@ public class Item {
     private String name;
     private String description;
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    @ManyToOne
+    private User user;
+
     public long getId() {
         return id;
     }
