@@ -9,6 +9,8 @@
 <a th:href="@{/users/}">Back to List of Users</a><br><br>
 <b>Name: </b> <span th:text="${user.name}"></span><br>
 <b>Email: </b> <span th:text="${user.email}"></span><br>
+<b>Data from DTO: </b>
+<span th:text="${userDTO.name + ', ' + userDTO.password}"></span><br>
 
 <a th:href="@{'/users/' + ${user.id} + '/edit'}">Edit User</a><br>
 <a th:href="@{'/users/' + ${user.id} + '/delete'}">Delete User</a>
